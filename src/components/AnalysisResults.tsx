@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -14,6 +15,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { SkinAnalysisResult } from "@/types/analysis";
+import { ProductRecommendationsModal } from "./ProductRecommendationsModal";
 
 interface AnalysisResultsProps {
   result: SkinAnalysisResult;
@@ -22,6 +24,15 @@ interface AnalysisResultsProps {
 }
 
 export function AnalysisResults({ result, imageUrl, onBack }: AnalysisResultsProps) {
+  const [showProductModal, setShowProductModal] = useState(false);
+
+  // Автоматически показываем модальное окно через 1 секунду после загрузки
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowProductModal(true);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
   const getSeverityClass = (severity: string) => {
     switch (severity) {
       case "mild": return "severity-badge-mild";
@@ -220,6 +231,13 @@ export function AnalysisResults({ result, imageUrl, onBack }: AnalysisResultsPro
           </div>
         </div>
       </div>
+
+      <ProductRecommendationsModal
+        isOpen={showProductModal}
+        onClose={() => setShowProductModal(false)}
+        skinType={result.skinType}
+        conditions={result.conditions}
+      />
     </section>
   );
 }
