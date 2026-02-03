@@ -12,11 +12,14 @@ import {
   Wind,
   Heart,
   Stethoscope,
-  Sparkles
+  Sparkles,
+  Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { SkinAnalysisResult } from "@/types/analysis";
 import { ProductRecommendationsModal } from "./ProductRecommendationsModal";
+import { generatePdfReport } from "@/utils/generatePdfReport";
+import { useToast } from "@/hooks/use-toast";
 
 interface AnalysisResultsProps {
   result: SkinAnalysisResult;
@@ -26,6 +29,28 @@ interface AnalysisResultsProps {
 
 export function AnalysisResults({ result, imageUrl, onBack }: AnalysisResultsProps) {
   const [showProductModal, setShowProductModal] = useState(false);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const { toast } = useToast();
+
+  const handleDownloadPdf = async () => {
+    setIsGeneratingPdf(true);
+    try {
+      await generatePdfReport(result, imageUrl);
+      toast({
+        title: "PDF создан",
+        description: "Отчёт успешно скачан",
+      });
+    } catch (error) {
+      console.error("PDF generation error:", error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось создать PDF",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
 
   const getSeverityClass = (severity: string) => {
     switch (severity) {
@@ -85,9 +110,18 @@ export function AnalysisResults({ result, imageUrl, onBack }: AnalysisResultsPro
               <Sparkles className="w-4 h-4" />
               Подобрать средства
             </Button>
-            <Button variant="outline" className="gap-2">
-              <Download className="w-4 h-4" />
-              Скачать отчёт
+            <Button 
+              variant="outline" 
+              className="gap-2"
+              onClick={handleDownloadPdf}
+              disabled={isGeneratingPdf}
+            >
+              {isGeneratingPdf ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Download className="w-4 h-4" />
+              )}
+              Скачать PDF
             </Button>
           </div>
         </div>
