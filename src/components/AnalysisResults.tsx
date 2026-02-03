@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -11,7 +11,8 @@ import {
   Sun,
   Wind,
   Heart,
-  Stethoscope
+  Stethoscope,
+  Sparkles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { SkinAnalysisResult } from "@/types/analysis";
@@ -26,13 +27,6 @@ interface AnalysisResultsProps {
 export function AnalysisResults({ result, imageUrl, onBack }: AnalysisResultsProps) {
   const [showProductModal, setShowProductModal] = useState(false);
 
-  // Автоматически показываем модальное окно через 1 секунду после загрузки
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowProductModal(true);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
   const getSeverityClass = (severity: string) => {
     switch (severity) {
       case "mild": return "severity-badge-mild";
@@ -77,15 +71,25 @@ export function AnalysisResults({ result, imageUrl, onBack }: AnalysisResultsPro
     <section className="py-12 px-4 animate-fade-in">
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-8 flex-wrap gap-3">
           <Button variant="ghost" onClick={onBack} className="gap-2">
             <ArrowLeft className="w-4 h-4" />
             Назад
           </Button>
-          <Button variant="outline" className="gap-2">
-            <Download className="w-4 h-4" />
-            Скачать отчёт
-          </Button>
+          <div className="flex gap-3">
+            <Button 
+              variant="hero" 
+              onClick={() => setShowProductModal(true)} 
+              className="gap-2"
+            >
+              <Sparkles className="w-4 h-4" />
+              Подобрать средства
+            </Button>
+            <Button variant="outline" className="gap-2">
+              <Download className="w-4 h-4" />
+              Скачать отчёт
+            </Button>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
